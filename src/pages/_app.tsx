@@ -1,0 +1,29 @@
+import '@styles/globals.css'
+import type { AppProps } from 'next/app'
+import { ThemeProvider } from '@mui/material'
+import theme from 'ui/themes/theme'
+import Head from 'next/head'
+import Header from 'ui/components/surfaces/Header/Header'
+
+function MyApp({ Component, pageProps }: AppProps) {
+  return(
+    <>
+    <Head>
+      <title>e-diaristas</title>
+      <link rel='preconnect' href="https://fonts.googleapis.com" />
+      <link rel='preconnect' href="https://fonts.gstatic.com" crossOrigin="" />
+      {/* eslint-disable @next/next/no-page-custom-font */}
+      <link href="https://fonts.googleapis.com/css?family=Poppins:ital,wght@0;400;0;500;0;600;700&display=swap" rel="stylesheet" />
+       
+       {/* eslint-disable @next/next/no-css-tag */}
+      <link href="/fonts/tw-icons/css/treinaweb-icons.css" rel="stylesheet" />
+    </Head>
+
+    <ThemeProvider theme={theme}>
+      <Header />
+      <Component {...pageProps} />
+    </ThemeProvider>
+     </>
+     );
+}
+export default MyApp

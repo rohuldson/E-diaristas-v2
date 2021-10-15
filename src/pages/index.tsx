@@ -3,10 +3,28 @@ import SafeEnvironment from "ui/components/feedback/SafeEnvironment/SafeEnvironm
 import PageTitle from "ui/components/data-display/PageTitle/PageTitle";
 import UserInformation from "ui/components/data-display/UserInformation/UserInformation";
 import TextFieldMask from "ui/components/inputs/TextFieldMask/TextFieldMask";
-import { Button, Typography } from "@mui/material";
-import { FormElementsContainer } from "@styles/pages/index.style";
+import { Button, Typography, Container, CircularProgress } from "@mui/material";
+import {
+  FormElementsContainer,
+  ProfissionaisPaper,
+  ProfissionaisContainer,
+} from "@styles/pages/index.style";
+
+import useIndex from "data/hooks/pages/useIndex.page";
 
 const Home: NextPage = () => {
+  const {
+    cep,
+    setCep,
+    cepValido,
+    buscarProfissionais,
+    erro,
+    diaristas,
+    diaristasRestantes,
+    buscaFeita,
+    carregando,
+  } = useIndex();
+
   return (
     <div>
       <SafeEnvironment />
@@ -17,28 +35,64 @@ const Home: NextPage = () => {
         }
       />
 
-      <FormElementsContainer>
-        <TextFieldMask
-          label={"Digite seu CEP"}
-          mask={"99.999-999"}
-          fullWidth
-          variant={"outlined"}
-        />
-        <Typography color={"error"}>CEP inválido</Typography>
-        <Button
-          variant={"contained"}
-          color={"secondary"}
-          sx={{ width: "220px" }}
-        >
-          Buscar
-        </Button>
-      </FormElementsContainer>
-      <UserInformation
-        name={"Ronald S"}
-        picture={"https://github.com/rohuldson.png"}
-        rating={4}
-        description={"São Paulo"}
-      />
+      <Container>
+        <FormElementsContainer>
+          <TextFieldMask
+            label={"Digite seu CEP"}
+            mask={"99.999-999"}
+            fullWidth
+            variant={"outlined"}
+            value={cep}
+            onChange={(event) => setCep(event.target.value)}
+          />
+          {erro && <Typography color={"error"}>{erro}</Typography>}
+
+          <Button
+            variant={"contained"}
+            color={"secondary"}
+            sx={{ width: "220px" }}
+            disabled={!cepValido || carregando}
+            onClick={() => buscarProfissionais(cep)}
+          >
+            {carregando ? <CircularProgress size={20} /> : " Buscar"}
+          </Button>
+        </FormElementsContainer>
+
+        { buscaFeita  && 
+        ( diaristas.length > 0 ?
+          <ProfissionaisPaper>
+            <ProfissionaisContainer>
+              
+              {diaristas.map((item, index) => {
+                return (
+                  <UserInformation
+                  key={index}
+                    name={item.nome_completo}
+                    picture={item.foto_usuario}
+                    rating={item.reputacao}
+                    description={item.cidade}
+                  />
+                );
+
+              })};
+            </ProfissionaisContainer>
+
+            <Container  sx={{textAlign: 'center'}}>
+              {diaristasRestantes > 0 && (
+              <Typography sx={{mt: 5}}>
+              ... e mais {diaristasRestantes}{' '}{diaristasRestantes > 1 ? 'profissionais atendem' : 'profissional atende'}{' '} ao seu endereço.
+              </Typography>
+
+              )}
+            <Button variant={'contained'} color={'secondary'} sx={{mt: 5}}>Contratar um profissional</Button>
+            </Container>
+          </ProfissionaisPaper>
+          :
+          (
+            <Typography sx={{mb: 8}}align={'center'} color={'textPrimary'}>Ainda não temos nenhuma profissional disponível neste CEP.</Typography>
+          )
+        )}
+      </Container>
     </div>
   );
 };
